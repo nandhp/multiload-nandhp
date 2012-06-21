@@ -1,0 +1,9 @@
+[Xfce Panel]
+Type=X-XFCE-PanelPlugin
+Encoding=UTF-8
+_Name=Multiload Plugin
+_Comment=Multiload plugin for the Xfce panel
+Icon=xfce4-multiload-plugin
+X-XFCE-Module=multiload
+X-XFCE-Internal=false
+X-XFCE-Unique=false

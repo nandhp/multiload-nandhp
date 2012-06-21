@@ -1,0 +1,3 @@
+panel-plugin/multiload.c
+panel-plugin/multiload-dialogs.c
+panel-plugin/multiload.desktop.in
