@@ -55,9 +55,13 @@ load_graph_draw (LoadGraph *g)
      * (after the user resized the applet in the prop dialog). */
 
     if (!g->surface)
-		g->surface = gdk_window_create_similar_surface (gtk_widget_get_window (g->disp),
-					                        CAIRO_CONTENT_COLOR,
-                                                                g->draw_width, g->draw_height);
+        g->surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
+                                                g->draw_width, g->draw_height);
+        /* Not available on GTK < 2.22
+           gdk_window_create_similar_surface (gtk_widget_get_window (g->disp),
+                                              CAIRO_CONTENT_COLOR,
+                                              g->draw_width, g->draw_height);
+         */
 	
     style = gtk_widget_get_style (g->disp);
 
@@ -180,9 +184,13 @@ load_graph_configure (GtkWidget *widget, GdkEventConfigure *event,
     load_graph_alloc (c);
  
     if (!c->surface)
-	c->surface = gdk_window_create_similar_surface (gtk_widget_get_window (c->disp),
-                                                        CAIRO_CONTENT_COLOR,
-				                        c->draw_width, c->draw_height);
+        c->surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24,
+                                                c->draw_width, c->draw_height);
+        /* Not available on GTK < 2.22
+           gdk_window_create_similar_surface (gtk_widget_get_window (c->disp),
+                                              CAIRO_CONTENT_COLOR,
+                                              c->draw_width, c->draw_height);
+         */
 
     gtk_widget_queue_draw (widget);
 

@@ -14,7 +14,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -34,7 +34,11 @@ static void
 multiload_construct (XfcePanelPlugin *plugin);
 
 /* register the plugin */
-XFCE_PANEL_PLUGIN_REGISTER (multiload_construct);
+#ifdef XFCE_PANEL_PLUGIN_REGISTER
+XFCE_PANEL_PLUGIN_REGISTER (multiload_construct);           /* Xfce 4.8 */
+#else
+XFCE_PANEL_PLUGIN_REGISTER_INTERNAL (multiload_construct);  /* Xfce 4.6 */
+#endif
 
 static MultiloadXfcePlugin *
 multiload_new (XfcePanelPlugin *plugin)

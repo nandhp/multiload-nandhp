@@ -14,7 +14,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -24,12 +24,19 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#ifdef HAVE_XFCE4UI
 #include <libxfce4ui/libxfce4ui.h>
+#elif HAVE_XFCEGUI4
+#include <libxfcegui4/libxfcegui4.h>
+#else
+#error Must have one of libxfce4ui or xfcegui4
+#endif
 #include <libxfce4panel/xfce-panel-plugin.h>
 
 #include "multiload.h"
 #include "properties.h"
 #include "xfce4-multiload-plugin.h"
+#include "xfce4-multiload-settings.h"
 #include "xfce4-multiload-dialogs.h"
 
 /* the website url */
@@ -45,7 +52,8 @@ multiload_configure_response (GtkWidget           *dialog,
   if (response == GTK_RESPONSE_HELP)
     {
       /* show help */
-      result = g_spawn_command_line_async ("exo-open --launch WebBrowser " PLUGIN_WEBSITE, NULL);
+      result = g_spawn_command_line_async ("exo-open --launch WebBrowser "
+                                           PLUGIN_WEBSITE, NULL);
 
       if (G_UNLIKELY (result == FALSE))
         g_warning (_("Unable to open the following url: %s"), PLUGIN_WEBSITE);
@@ -73,7 +81,7 @@ multiload_configure_get_plugin (GtkWidget *widget)
 {
   GtkWidget *toplevel = gtk_widget_get_toplevel (widget);
   MultiloadPlugin *ma = NULL;
-  if ( gtk_widget_is_toplevel (toplevel) )
+  if ( G_LIKELY (gtk_widget_is_toplevel (toplevel)) )
     ma = g_object_get_data(G_OBJECT(toplevel), "MultiloadPlugin");
   else      
     g_assert_not_reached ();
@@ -103,7 +111,7 @@ multiload_configure (XfcePanelPlugin     *plugin,
   gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
 
   /* set dialog icon */
-  gtk_window_set_icon_name (GTK_WINDOW (dialog), "xfce4-settings");
+  gtk_window_set_icon_name (GTK_WINDOW (dialog), "utilities-system-monitor");
 
   /* link the dialog to the plugin, so we can destroy it when the plugin
    * is closed, but the dialog is still open */
@@ -111,14 +119,9 @@ multiload_configure (XfcePanelPlugin     *plugin,
   g_object_set_data (G_OBJECT (dialog), "MultiloadPlugin", &multiload->ma);
 
   /* Initialize dialog widgets */
-  //gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  //gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  //gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
-  //gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
+  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   multiload_init_preferences(dialog, &multiload->ma);
-	
-  //g_signal_connect(G_OBJECT(dialog), "response",
-  //		   G_CALLBACK(properties_close_cb), ma);
 
   /* connect the reponse signal to the dialog */
   g_signal_connect (G_OBJECT (dialog), "response",
@@ -128,46 +131,22 @@ multiload_configure (XfcePanelPlugin     *plugin,
   gtk_widget_show_all (dialog);
 }
 
+#include "about-data.h"
+
 void
 multiload_about (XfcePanelPlugin *plugin)
 {
-  const gchar license[] = 
-    "This program is free software; you can redistribute it and/or\n"
-    "modify it under the terms of the GNU General Public License as\n"
-    "published by the Free Software Foundation; either version 2 of\n"
-    "the License, or (at your option) any later version.\n"
-    "\n"
-    "This program is distributed in the hope that it will be useful,\n"
-    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-    "GNU General Public License for more details.\n"
-    "\n"
-    "You should have received a copy of the GNU General Public License\n"
-    "along with this program; if not, write to the Free Software\n"
-    "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA\n";
-
-  const gchar * const authors[] = {
-    "nandhp <nandhp@gmail.com>",
-    "Martin Baulig <martin@home-of-linux.org>",
-    "Todd Kulesza <fflewddur@dropline.net>",
-    "Benoît Dejean <TazForEver@dlfp.org>",
-    "Davyd Madeley <davyd@madeley.id.au>",
-    NULL
-  };
-
   gtk_show_about_dialog(NULL,
-      //"logo",         icon,
-      //"logo-icon-name", "utilities-system-monitor",
-      "program-name", PACKAGE_NAME,
+      "logo-icon-name", "utilities-system-monitor",
+      //"program-name", PACKAGE_NAME,
       "version",      PACKAGE_VERSION,
-      "comments",     _("A system load monitor capable of displaying graphs "
-                        "for CPU, RAM, and swap space use, plus network "
-                        "traffic."),
+      "comments",     _("A system load monitor that graphs processor, memory, "
+                        "and swap space use, plus network and disk activity."),
       "website",      PLUGIN_WEBSITE,
-      "copyright",    _("Copyright \xC2\xA9 1999-2005 nandhp, FSF, and others\n"),
-      "license",      license,
-      "authors",      authors,
-      //"documenters",  documenters,
+      "copyright",    _("Copyright \xC2\xA9 1999-2012 nandhp, FSF, and others\n"),
+      "license",      about_data_license,
+      "authors",      about_data_authors,
+      //"documenters",  about_data_documenters,
       "translator-credits", _("translator-credits"),
       NULL);
 }

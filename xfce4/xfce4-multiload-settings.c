@@ -14,7 +14,7 @@
  *
  *  You should have received a copy of the GNU General Public License along
  *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -139,7 +139,7 @@ multiload_read (XfcePanelPlugin *plugin,
 
               /* Load the user's preferred colors */
               listpos = list;
-              if ( listpos )
+              if ( G_LIKELY (listpos) )
                 for ( j = 0; j < ncolors && listpos != NULL; j++ )
                   {
                     /* Check the length of the list item. */
@@ -150,7 +150,7 @@ multiload_read (XfcePanelPlugin *plugin,
                       pos = (int)(strchr(listpos, ',')-listpos);
 
                     /* Try to parse the color */
-                    if ( pos == 7 )
+                    if ( G_LIKELY (pos == 7) )
                       {
                         /* Extract the color into a null-terminated buffer */
                         char buf[8];

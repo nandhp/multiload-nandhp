@@ -1,7 +1,8 @@
-AC_PREREQ(2.50)
+AC_PREREQ(2.60)
 AC_INIT([xfce4-multiload-plugin], [0.1], [nandhp@gmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([1.8 -Wall -Werror dist-bzip2])
+AM_INIT_AUTOMAKE([1.11 -Wall -Werror no-dist-gzip dist-xz silent-rules])
+AM_SILENT_RULES([yes])
 # AM_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE()
 
@@ -43,16 +44,19 @@ do
     echo $lang >> $srcdir/po/LINGUAS
 done
 
-GETTEXT_PACKAGE=lxpanel
+# Set up gettext
+GETTEXT_PACKAGE=xfce4-multiload-plugin
 #AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.14.1)
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package.])
 
 AM_GLIB_GNU_GETTEXT
 
 # Dependencies
-AM_PATH_GTK_2_0([2.10.0],,AC_MSG_ERROR([Gtk+ 2.10.0 or higher required.]))
+AM_PATH_GTK_2_0([2.14.0],,AC_MSG_ERROR([Gtk+ 2.14.0 or higher required.]))
+PKG_CHECK_MODULES(CAIRO, [cairo])
+AC_SUBST(CAIRO_CFLAGS)
+AC_SUBST(CAIRO_LIBS)
 PKG_CHECK_MODULES(LIBGTOP, [libgtop-2.0 >= 2.11.92])
 AC_SUBST(LIBGTOP_CFLAGS)
 AC_SUBST(LIBGTOP_LIBS)
@@ -61,24 +65,37 @@ AC_SUBST(LIBGTOP_LIBS)
 AC_ARG_WITH([xfce4], AS_HELP_STRING([--with-xfce4], [Build plugin for xfce4-panel]),
             [], [with_xfce4=check])
 AS_IF([test "x$with_xfce4" != "xno"], [
-    pkg_modules="libxfce4ui-1 >= 4.6.0 \
-                 libxfce4util-1.0 >= 4.6.0
+    pkg_modules="libxfce4util-1.0 >= 4.6.0
                  libxfce4panel-1.0 >= 4.6.0"
-    PKG_CHECK_MODULES(XFCE4, [$pkg_modules],
-                      [
-                        AC_DEFINE([HAVE_XFCE4], [1], [Support for xfce4-panel])
-                        with_xfce4=yes
-                      ],[
-                        if test "x$with_xfce4" != xcheck; then
-                          AC_MSG_FAILURE(
-                           [--with-xfce4 was given, but test failed])
-                        fi
-                        with_xfce4=no
-                      ])
+    PKG_CHECK_MODULES(XFCE4, [$pkg_modules], [
+        AC_DEFINE([HAVE_XFCE4], [1], [Support for xfce4-panel])
+        with_xfce4=yes
+        # Check if we have libxfce4ui or libxfcegui4
+        PKG_CHECK_MODULES([XFCE4UI], [libxfce4ui-1 >= 4.8.0],
+            [
+                AC_DEFINE([HAVE_XFCE4UI], [1], [Have libxfce4ui])
+                xfce_is_4_6=no
+            ],[
+                PKG_CHECK_MODULES([XFCEGUI4], [libxfcegui4-1.0 >= 4.6.0],
+                    [AC_DEFINE([HAVE_XFCEGUI4], [1], [Have libxfcegui4])])
+                xfce_is_4_6=yes
+            ])
+    ],[
+        if test "x$with_xfce4" != xcheck; then
+          AC_MSG_FAILURE(
+           [--with-xfce4 was given, but test failed])
+        fi
+        with_xfce4=no
+    ])
 ])
 AM_CONDITIONAL([HAVE_XFCE4], [test x$with_xfce4 = xyes])
+AM_CONDITIONAL([XFCE_IS_4_6], [test x$xfce_is_4_6 = xyes])
 AC_SUBST(XFCE4_CFLAGS)
 AC_SUBST(XFCE4_LIBS)
+AC_SUBST(XFCE4UI_CFLAGS)
+AC_SUBST(XFCE4UI_LIBS)
+AC_SUBST(XFCEGUI4_CFLAGS)
+AC_SUBST(XFCEGUI4_LIBS)
 
 # lxpanel
 AC_ARG_WITH([lxpanel], AS_HELP_STRING([--with-lxpanel], [Build plugin for lxpanel]),
@@ -101,12 +118,30 @@ AM_CONDITIONAL(HAVE_LXPANEL, test x$with_lxpanel = xyes)
 AC_SUBST(LXPANEL_CFLAGS)
 AC_SUBST(LXPANEL_LIBS)
 
+if test x$with_xfce4 != xyes && test x$with_lxpanel != xyes; then
+    AC_MSG_FAILURE([No supported panels are installed and available.])
+fi
+
+# Directories; for substitution into .desktop files.
+# From https://mail.gnome.org/archives/commits-list/2012-March/msg14085.html
+# Of course it's worth noting that the patch in that message was to replace
+# this nasty hack with an awk version that runs from the Makefile...
+if test "${prefix}" = "NONE"; then
+    prefix=/usr/local
+fi
+if test "${exec_prefix}" = "NONE"; then
+    exec_prefix=$prefix
+fi
+eval LIBDIR="$libdir"
+AC_SUBST([LIBDIR])
+
 # Output files
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
     Makefile
     multiload/Makefile
     xfce4/Makefile
+    xfce4/multiload.desktop.in
     po/Makefile.in
 ])
 AC_OUTPUT
