@@ -23,5 +23,6 @@ po/.intltool-merge-cache
 po/Makefile.in.in
 po/POTFILES
 stamp-*
+*-stamp
 about-data.h
 old

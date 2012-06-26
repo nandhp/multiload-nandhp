@@ -36,7 +36,8 @@ about-data.h: AUTHORS
 EXTRA_DIST = \
 	intltool-extract.in \
 	intltool-merge.in \
-	intltool-update.in
+	intltool-update.in \
+	AUTHORS COPYING ChangeLog README.md
 
 DISTCLEANFILES = \
 	intltool-extract \
