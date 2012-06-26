@@ -46,7 +46,7 @@ multiload_read(char **fp, MultiloadPlugin *ma)
   for ( i = 0; i < NGRAPHS; i++ )
     {
       /* Default visibility and colors */
-      ma->graph_config[i].visible = 0;
+      ma->graph_config[i].visible = FALSE;
       multiload_colorconfig_default(ma, i);
     }
 
@@ -259,7 +259,7 @@ static void multiload_configure(Plugin * p, GtkWindow * parent)
 
   /* create the dialog */
   multiload->dlg = gtk_dialog_new_with_buttons
-      (_("Multiload Plugin"),
+      (_("Multiload"),
        parent,
        GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_NO_SEPARATOR,
        GTK_STOCK_HELP, GTK_RESPONSE_HELP,

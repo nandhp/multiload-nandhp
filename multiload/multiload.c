@@ -138,8 +138,12 @@ multiload_refresh(MultiloadPlugin *ma, GtkOrientation orientation)
     gtk_widget_show (ma->box);
     gtk_container_add (ma->container, ma->box);
     ma->orientation = orientation;
+    /* We use show/hide to control graph visibility. Don't let a rouge panel
+     * screw that up. */
+    gtk_widget_set_no_show_all (ma->box, TRUE);
 
-    /* create the NGRAPHS graphs, passing in their user-configurable properties with gconf. */
+    /* Create the NGRAPHS graphs, with user-configurable properties taken
+     * from ma->graph_config. */
     multiload_create_graphs (ma);
 
     /* only start and display the graphs the user has turned on */
@@ -149,7 +153,7 @@ multiload_refresh(MultiloadPlugin *ma, GtkOrientation orientation)
 		           ma->graphs[i]->main_widget, 
 		           TRUE, TRUE, 1);
         if (ma->graph_config[i].visible) {
-        	gtk_widget_show_all (ma->graphs[i]->main_widget);
+            gtk_widget_show_all (ma->graphs[i]->main_widget);
 	    load_graph_start(ma->graphs[i]);
         }
     }

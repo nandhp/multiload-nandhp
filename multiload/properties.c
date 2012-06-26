@@ -192,7 +192,7 @@ add_page(GtkNotebook *notebook, const gchar *label)
 	return page;
 }
 
-/* save the selected color to gconf and apply it on the applet */
+/* apply the selected color to the applet */
 static void
 color_picker_set_cb(GtkColorButton *color_picker, gpointer data)
 {
@@ -243,7 +243,8 @@ add_color_selector(GtkWidget *page, const gchar *name, guint graph, guint index,
   return;
 }
 
-/* creates the properties dialog using up-to-the-minute info from gconf */
+/* creates the properties dialog and initialize it from the current
+ * configuration */
 void
 multiload_init_preferences(GtkWidget *dialog, MultiloadPlugin *ma)
 {
