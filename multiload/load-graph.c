@@ -229,8 +229,7 @@ load_graph_destroy (GtkWidget *widget, gpointer data_ptr)
 static gboolean
 load_graph_clicked (GtkWidget *widget, GdkEventButton *event, LoadGraph *load)
 {
-	//load->multiload->last_clicked = load->id;
-	// Formerly used to have properties open to this graph.
+	/* Formerly used to have properties open to this graph. */
 
 	return FALSE;
 }
@@ -258,32 +257,8 @@ load_graph_leave_cb(GtkWidget *widget, GdkEventCrossing *event, gpointer data)
 	return TRUE;
 }
 
-#if 0
-//FIXME
-static void
-load_graph_load_config (LoadGraph *g)
-{
-	
-    const gchar *temp;
-    guint i, num_colors = graph_types[g->id].num_colors;
-
-    if (!g->colors)
-        g->colors = g_new0(GdkColor, num_colors);
-	
-    for (i = 0; i < num_colors; i++)
-    {
-        temp = g->multiload->graph_config[g->id].colors[i];
-        if ( !temp || temp[0] == 0 )
-          temp = "#000000";
-        gdk_color_parse(temp, &(g->colors[i]));
-    }
-}
-#endif
-
 LoadGraph *
-load_graph_new (MultiloadPlugin *ma, guint id)// guint num_colors, const gchar *label,
-		// guint speed, guint size, gboolean visible, 
-		//const gchar *name, LoadGraphDataFunc get_data)
+load_graph_new (MultiloadPlugin *ma, guint id)
 {
     LoadGraph *g;
     
@@ -291,14 +266,6 @@ load_graph_new (MultiloadPlugin *ma, guint id)// guint num_colors, const gchar *
     g->netspeed_in = netspeed_new(g);
     g->netspeed_out = netspeed_new(g);
     g->id = id;
-    // FIXME
-    //g->n = graph_types[id].num_colors;
-    //g->name = graph_types[id].name;
-    //g->speed  = MAX (ma->speed, 50);
-    //g->size   = CLAMP (ma->size, 10, 400); //MAX (ma->size, 10);
-    //g->visible = ma->graph_config[id].visible;
-    //g->pixel_size = -1;// FIXME panel_applet_get_size (ma->applet);
-    //g->get_data = graph_types[id].get_data;
 
     g->tooltip_update = FALSE;
     g->show_frame = TRUE;
@@ -320,8 +287,6 @@ load_graph_new (MultiloadPlugin *ma, guint id)// guint num_colors, const gchar *
 	g->frame = NULL;
 	gtk_box_pack_start (GTK_BOX (g->main_widget), g->box, TRUE, TRUE, 0);
     }
-
-    //load_graph_load_config (g); FIXME
 
     g->timer_index = -1;
 

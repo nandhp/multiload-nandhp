@@ -2,7 +2,7 @@ if HAVE_XFCE4
 XFCE4_DIRS = xfce4
 endif
 if HAVE_LXPANEL
-#LXPANEL_DIRS = lxpanel
+LXPANEL_DIRS = lxpanel
 endif
 SUBDIRS =	\
 	multiload \

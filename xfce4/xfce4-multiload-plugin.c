@@ -85,10 +85,7 @@ multiload_free (XfcePanelPlugin *plugin,
   /* destroy the panel widgets */
   gtk_widget_destroy (multiload->ebox);
 
-  /* cleanup the settings */
-  //if (G_LIKELY (multiload->setting1 != NULL))
-  //  g_free (multiload->setting1);
-  // FIXME
+  /* cleanup the settings (FIXME) */
 
   /* free the plugin structure */
   panel_slice_free (MultiloadXfcePlugin, multiload);
@@ -140,7 +137,7 @@ multiload_construct (XfcePanelPlugin *plugin)
 {
   MultiloadXfcePlugin *multiload;
   
-  /* Initialize libgtop */
+  /* Initialize multiload */
   multiload_init ();
 
   /* setup transation domain */

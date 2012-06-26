@@ -8,6 +8,8 @@
 
 G_BEGIN_DECLS
 
+#define PLUGIN_WEBSITE "https://github.com/nandhp/multiload-nandhp"
+
 #define NCPUSTATES 5
 #define NGRAPHS 6
 #define MAX_COLORS 5
@@ -119,9 +121,22 @@ multiload_init();
 void
 multiload_destroy(MultiloadPlugin *ma);
 
-/* Utility function for data storage */
+/* Utility functions for preferences and data storage */
 gboolean
 multiload_gdk_color_stringify(GdkColor* color, gchar *color_string);
+
+void
+multiload_colorconfig_stringify(MultiloadPlugin *ma, guint i, char *list);
+
+void
+multiload_colorconfig_default(MultiloadPlugin *ma, guint i);
+
+void
+multiload_colorconfig_unstringify(MultiloadPlugin *ma, guint i,
+                                  const char *list);
+
+int
+multiload_find_graph_by_name(const char *str, const char **suffix);
 
 G_END_DECLS
 

@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([xfce4-multiload-plugin], [0.1], [nandhp@gmail.com])
+AC_INIT([multiload-nandhp], [0.1], [nandhp@gmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror no-dist-gzip dist-xz silent-rules])
 AM_SILENT_RULES([yes])
@@ -45,7 +45,7 @@ do
 done
 
 # Set up gettext
-GETTEXT_PACKAGE=xfce4-multiload-plugin
+GETTEXT_PACKAGE=multiload-nandhp
 #AM_GNU_GETTEXT([external])
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package.])
@@ -102,6 +102,7 @@ AC_ARG_WITH([lxpanel], AS_HELP_STRING([--with-lxpanel], [Build plugin for lxpane
             [], [with_lxpanel=check])
 AS_IF([test "x$with_lxpanel" != "xno"], [
     pkg_modules="lxpanel"
+    # libmenu-cache is implicitly required; we will fail if it's not present.
     PKG_CHECK_MODULES(LXPANEL, [$pkg_modules],
                       [
                         AC_DEFINE([HAVE_LXPANEL], [1], [Support for lxpanel])
@@ -142,6 +143,7 @@ AC_CONFIG_FILES([
     multiload/Makefile
     xfce4/Makefile
     xfce4/multiload.desktop.in
+    lxpanel/Makefile
     po/Makefile.in
 ])
 AC_OUTPUT

@@ -1,3 +1,6 @@
-panel-plugin/multiload.c
-panel-plugin/multiload-dialogs.c
-panel-plugin/multiload.desktop.in
+multiload/multiload.c
+multiload/netspeed.c
+multiload/properties.c
+xfce4/xfce4-multiload-plugin.c
+xfce4/xfce4-multiload-dialogs.c
+lxpanel/lxpanel-multiload-plugin.c

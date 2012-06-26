@@ -39,9 +39,6 @@
 #include "xfce4-multiload-settings.h"
 #include "xfce4-multiload-dialogs.h"
 
-/* the website url */
-#define PLUGIN_WEBSITE "http://goodies.xfce.org/projects/panel-plugins/xfce4-multiload-plugin"
-
 static void
 multiload_configure_response (GtkWidget           *dialog,
                               gint                 response,
@@ -138,15 +135,15 @@ multiload_about (XfcePanelPlugin *plugin)
 {
   gtk_show_about_dialog(NULL,
       "logo-icon-name", "utilities-system-monitor",
-      //"program-name", PACKAGE_NAME,
+      "program-name", _("Multiload"),
       "version",      PACKAGE_VERSION,
       "comments",     _("A system load monitor that graphs processor, memory, "
                         "and swap space use, plus network and disk activity."),
       "website",      PLUGIN_WEBSITE,
-      "copyright",    _("Copyright \xC2\xA9 1999-2012 nandhp, FSF, and others\n"),
+      "copyright",    _("Copyright \xC2\xA9 1999-2012 nandhp, FSF, and others"),
       "license",      about_data_license,
       "authors",      about_data_authors,
-      //"documenters",  about_data_documenters,
+      /* "documenters",  about_data_documenters, */
       "translator-credits", _("translator-credits"),
       NULL);
 }

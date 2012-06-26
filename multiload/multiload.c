@@ -99,27 +99,12 @@ multiload_tooltip_update(LoadGraph *g)
 static void
 multiload_create_graphs(MultiloadPlugin *ma)
 {
-    //gint speed, size;
     gint i;
-
-    //speed = ma->speed; // FIXME panel_applet_gconf_get_int (ma->applet, "speed", NULL);
-    //size = ma->size;
-    //speed = MAX (speed, 50);
-    //size = CLAMP (size, 10, 400);
 
     for (i = 0; i < G_N_ELEMENTS (graph_types); i++)
     {
-        //gboolean visible = ma->graph_config[i].visible;
         g_assert (graph_types[i].num_colors <= MAX_COLORS);
-        ma->graphs[i] = load_graph_new (ma,
-                                        //graph_types[i].num_colors,
-                                        ////graph_types[i].label,
-                                        i);//,
-                                        //speed,
-                                        //size,
-                                        //visible,
-                                        //graph_types[i].name,
-                                        //graph_types[i].callback);
+        ma->graphs[i] = load_graph_new (ma, i);
     }
 }
 
@@ -127,7 +112,6 @@ multiload_create_graphs(MultiloadPlugin *ma)
 void
 multiload_refresh(MultiloadPlugin *ma, GtkOrientation orientation)
 {
-  //FIXME: Used to do gtk_orientable_set_orientation (GTK_ORIENTABLE (multiload->box), orientation);
     gint i;
 
     /* stop and free the old graphs */
@@ -146,6 +130,7 @@ multiload_refresh(MultiloadPlugin *ma, GtkOrientation orientation)
     if (ma->box)
       gtk_widget_destroy(ma->box);
 
+    /* Can we do gtk_orientable_set_orientation? */
     if ( orientation == GTK_ORIENTATION_HORIZONTAL )
       ma->box = gtk_hbox_new (FALSE, 0);
     else
@@ -230,7 +215,9 @@ multiload_destroy(MultiloadPlugin *ma)
   return;
 }
 
-
+/* Convert a GdkColor into a string of the form "#aabbcc" Output string must
+   have size at least 8.
+ */
 gboolean
 multiload_gdk_color_stringify(GdkColor* color, gchar *color_string)
 {
@@ -241,3 +228,93 @@ multiload_gdk_color_stringify(GdkColor* color, gchar *color_string)
   return retval; 
 }
 
+/* Convert a graph configuration into a string of the form
+   "#aabbcc,#ddeeff,...". Output string must have size at least 8*MAX_COLORS.
+ */
+void
+multiload_colorconfig_stringify(MultiloadPlugin *ma, guint i, char *list)
+{
+  guint ncolors = graph_types[i].num_colors, j;
+  GdkColor *colors = ma->graph_config[i].colors;
+  char *listpos = list;
+
+  if ( G_UNLIKELY (!list) )
+    return;
+
+  /* Create color list */
+  for ( j = 0; j < ncolors; j++ )
+    {
+      multiload_gdk_color_stringify(&colors[j], listpos);
+      if ( j == ncolors-1 )
+        listpos[7] = 0;
+      else
+        listpos[7] = ',';
+      listpos += 8;
+    }
+  g_assert (strlen(list) == 8*ncolors-1);
+}
+
+/* Set the colors for graph i to the default values */
+void
+multiload_colorconfig_default(MultiloadPlugin *ma, guint i)
+{
+  guint j;
+  for ( j = 0; j < graph_types[i].num_colors; j++ )
+    gdk_color_parse(graph_types[i].colors[j].default_value,
+                    &ma->graph_config[i].colors[j]);
+}
+
+/* Set the colors for a graph from a string, as produced by
+   multiload_colorconfig_stringify
+ */
+void
+multiload_colorconfig_unstringify(MultiloadPlugin *ma, guint i,
+                                  const char *list)
+{
+  guint ncolors = graph_types[i].num_colors, j;
+  GdkColor *colors = ma->graph_config[i].colors;
+  const char *listpos = list;
+
+  if ( G_UNLIKELY (!listpos) )
+    return multiload_colorconfig_default(ma, i);
+
+  for ( j = 0; j < ncolors; j++ )
+    {
+      /* Check the length of the list item. */
+      int pos = 0;
+      if ( j == ncolors-1 )
+        pos = strlen(listpos);
+      else
+        pos = (int)(strchr(listpos, ',')-listpos);
+
+      /* Try to parse the color */
+      if ( G_UNLIKELY (pos != 7) )
+        return multiload_colorconfig_default(ma, i);
+
+      /* Extract the color into a null-terminated buffer */
+      char buf[8];
+      strncpy(buf, listpos, 7);
+      buf[7] = 0;
+      if ( G_UNLIKELY (gdk_color_parse(buf, &colors[j]) != TRUE) )
+        return multiload_colorconfig_default(ma, i);
+
+      listpos += 8;
+    }
+}
+
+int
+multiload_find_graph_by_name(const char *str, const char **suffix)
+{
+  guint i;
+  for ( i = 0; i < NGRAPHS; i++ )
+    {
+      int n = strlen(graph_types[i].name);
+      if ( strncasecmp(str, graph_types[i].name, n) == 0 )
+        {
+          if ( suffix )
+            *suffix = str+n;
+          return i;
+        }
+    }
+  return -1;
+}

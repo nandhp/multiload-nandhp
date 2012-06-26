@@ -60,29 +60,15 @@ multiload_save (XfcePanelPlugin *plugin,
       
       for ( i = 0; i < NGRAPHS; i++ )
         { 
-          char *key;
-          char list[8*MAX_COLORS], *listpos = list;
-          guint ncolors = graph_types[i].num_colors, j;
-          GdkColor *colors = ma->graph_config[i].colors;
+          char *key, list[8*MAX_COLORS];
 
           /* Visibility */
           key = g_strdup_printf("%s_visible", graph_types[i].name);
           xfce_rc_write_bool_entry (rc, key, ma->graph_config[i].visible);
           g_free (key);
 
-          /* Create color list */
-          for ( j = 0; j < ncolors; j++ )
-            {
-              multiload_gdk_color_stringify(&colors[j], listpos);
-              if ( j == ncolors-1 )
-                listpos[7] = 0;
-              else
-                listpos[7] = ',';
-              listpos += 8;
-            }
-          g_assert (strlen(list) == 8*graph_types[i].num_colors-1);
-
           /* Save colors */
+          multiload_colorconfig_stringify (ma, i, list);
           key = g_strdup_printf("%s_colors", graph_types[i].name);
           xfce_rc_write_entry (rc, key, list);
           g_free (key);
@@ -99,7 +85,7 @@ multiload_read (XfcePanelPlugin *plugin,
 {
   XfceRc *rc;
   gchar *file;
-  guint i;
+  guint i, found = 0;
 
   /* get the plugin config file location */
   file = xfce_panel_plugin_lookup_rc_file (plugin);
@@ -122,9 +108,7 @@ multiload_read (XfcePanelPlugin *plugin,
           for ( i = 0; i < NGRAPHS; i++ )
             { 
               char *key;
-              const char *list, *listpos;
-              guint ncolors = graph_types[i].num_colors, j;
-              GdkColor *colors = ma->graph_config[i].colors;
+              const char *list;
 
               /* Visibility */
               key = g_strdup_printf("%s_visible", graph_types[i].name);
@@ -136,44 +120,18 @@ multiload_read (XfcePanelPlugin *plugin,
               key = g_strdup_printf("%s_colors", graph_types[i].name);
               list = xfce_rc_read_entry (rc, key, NULL);
               g_free (key);
-
-              /* Load the user's preferred colors */
-              listpos = list;
-              if ( G_LIKELY (listpos) )
-                for ( j = 0; j < ncolors && listpos != NULL; j++ )
-                  {
-                    /* Check the length of the list item. */
-                    int pos = 0;
-                    if ( j == ncolors-1 )
-                      pos = strlen(listpos);
-                    else
-                      pos = (int)(strchr(listpos, ',')-listpos);
-
-                    /* Try to parse the color */
-                    if ( G_LIKELY (pos == 7) )
-                      {
-                        /* Extract the color into a null-terminated buffer */
-                        char buf[8];
-                        strncpy(buf, listpos, 7);
-                        buf[7] = 0;
-                        if ( gdk_color_parse(buf, &colors[j]) == TRUE )
-                          listpos += 8;
-                        else
-                          listpos = NULL;
-                      }
-                    else
-                      listpos = NULL;
-                  }
-
-              /* Use the default colors if read failed. */
-              if ( !listpos )
-                for ( j = 0; j < ncolors; j++ )
-                  gdk_color_parse(graph_types[i].colors[j].default_value,
-                                  &colors[j]);
+              multiload_colorconfig_unstringify(ma, i, list);
             }
 
           /* cleanup */
           xfce_rc_close (rc);
+
+          /* Ensure at lease one graph is visible */
+          for ( i = 0; i < NGRAPHS; i++ )
+            if ( ma->graph_config[i].visible == TRUE )
+              found++;
+          if ( found == 0 )
+            ma->graph_config[0].visible = TRUE;
 
           /* leave the function, everything went well */
           return;
@@ -187,12 +145,8 @@ multiload_read (XfcePanelPlugin *plugin,
   ma->size = DEFAULT_SIZE;
   for ( i = 0; i < NGRAPHS; i++ )
     { 
-      guint ncolors = graph_types[i].num_colors, j;
-      /* Default visibility */
+      /* Default visibility and colors */
       ma->graph_config[i].visible = i == 0 ? TRUE : FALSE;
-      /* Default colors */
-      for ( j = 0; j < ncolors; j++ )
-        gdk_color_parse(graph_types[i].colors[j].default_value,
-                        &ma->graph_config[i].colors[j]);
+      multiload_colorconfig_default(ma, i);
     }
 }
