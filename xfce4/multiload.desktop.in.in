@@ -1,8 +1,8 @@
 [Xfce Panel]
 Type=X-XFCE-PanelPlugin
 Encoding=UTF-8
-_Name=Multiload Plugin
-_Comment=Multiload plugin for the Xfce panel
+_Name=Multiload
+_Comment=A system load monitor that graphs processor, memory, and swap space use, plus network and disk activity.
 Icon=utilities-system-monitor
 X-XFCE-Module=multiload
 X-XFCE-Internal=false
