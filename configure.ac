@@ -6,6 +6,8 @@ AM_SILENT_RULES([yes])
 # AM_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE()
 
+AM_PROG_AR()
+
 LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
 
