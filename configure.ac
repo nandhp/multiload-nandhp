@@ -1,5 +1,5 @@
 AC_PREREQ(2.60)
-AC_INIT([multiload-nandhp], [0.1], [nandhp@gmail.com])
+AC_INIT([multiload-nandhp], [0.2], [nandhp@gmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([1.11 -Wall -Werror no-dist-gzip dist-xz silent-rules foreign])
 AM_SILENT_RULES([yes])
