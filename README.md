@@ -21,5 +21,9 @@ For the Xfce panel plugin:
 
 For the lxpanel plugin:
 
-- lxpanel
+- lxpanel                       <  0.7
 - libmenu-cache     (Required by lxpanel)
+
+lxpanel 0.7 introduces a backwards-incompatible API change; the
+multiload-nandhp lxpanel plugin will need to be rewritten to support
+newer versions of lxpanel.
