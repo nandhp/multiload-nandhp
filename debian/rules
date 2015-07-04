@@ -15,7 +15,7 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
-	./configure --prefix=/usr --with-xfce4 --with-lxpanel
+	./configure --prefix=/usr --with-xfce4
 	$(MAKE)
 
 	touch build-stamp
@@ -81,8 +81,7 @@ binary-common:
 
 # Build architecture independant packages using the common target.
 binary-indep: build install
-# (Uncomment this next line if you have such packages.)
-#	 $(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 
 # Build architecture dependant packages using the common target.
 binary-arch: build install

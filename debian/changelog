@@ -1,3 +1,10 @@
+multiload-nandhp (0.2-nandhp0) unstable; urgency=low
+
+  * New upstream release
+  * Do not build lxpanel plugin by default due to API change
+
+ -- nandhp <nandhp@gmail.com>  Fri,  3 Jul 2015 20:16:20 -0600
+
 multiload-nandhp (0.1-nandhp0) unstable; urgency=low
 
   * New upstream release
